@@ -1,0 +1,38 @@
+@model tl2_tp8_2025_ElAguhs.Models.Presupuesto 
+
+@{
+    ViewData["Title"] = "Crear Nuevo Presupuesto";
+}
+
+<h1>@ViewData["Title"]</h1>
+<h4>Encabezado del Presupuesto</h4>
+<hr />
+
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Create" method="post"> 
+            
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            
+            <div class="form-group">
+                <label asp-for="NombreDestinatario" class="control-label"></label>
+                <input asp-for="NombreDestinatario" class="form-control" />
+                <span asp-validation-for="NombreDestinatario" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mt-3">
+                <input type="submit" value="Crear Presupuesto" class="btn btn-success" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="mt-3">
+    <a asp-action="Index">Volver a la Lista</a>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

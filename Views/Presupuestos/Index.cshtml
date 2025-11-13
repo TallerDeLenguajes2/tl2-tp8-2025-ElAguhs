@@ -1,0 +1,44 @@
+@model List<tl2_tp8_2025_ElAguhs.Models.Presupuesto>
+// Le decimos a la vista que recibirá una Lista de 'Presupuesto'
+
+@{
+    ViewData["Title"] = "Lista de Presupuestos";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-success">Crear Nuevo Presupuesto</a> 
+</p>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Destinatario</th>
+            <th>Fecha de Creación</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.IdPresupuesto)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.NombreDestinatario)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.FechaCreacion)
+                </td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@item.IdPresupuesto" class="btn btn-sm btn-info">Detalles</a> |
+                    <a asp-action="Edit" asp-route-id="@item.IdPresupuesto" class="btn btn-sm btn-primary">Editar</a> |
+                    <a asp-action="Delete" asp-route-id="@item.IdPresupuesto" class="btn btn-sm btn-danger">Eliminar</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

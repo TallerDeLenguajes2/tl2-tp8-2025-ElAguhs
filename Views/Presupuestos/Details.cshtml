@@ -1,0 +1,69 @@
+@model tl2_tp8_2025_ElAguhs.Models.Presupuesto
+// El modelo es UN Presupuesto, que contiene una lista de Detalle.
+
+@{
+    ViewData["Title"] = "Detalle del Presupuesto";
+}
+
+<h1>Detalle del Presupuesto</h1>
+<hr />
+
+<div class="row">
+    <div class="col-md-6">
+        <h3>Información General</h3>
+        <dl class="row">
+            <dt class="col-sm-4">ID:</dt>
+            <dd class="col-sm-8">@Html.DisplayFor(model => model.IdPresupuesto)</dd>
+            
+            <dt class="col-sm-4">Destinatario:</dt>
+            <dd class="col-sm-8">@Html.DisplayFor(model => model.NombreDestinatario)</dd>
+
+            <dt class="col-sm-4">Fecha de Creación:</dt>
+            <dd class="col-sm-8">@Html.DisplayFor(model => model.FechaCreacion)</dd>
+            
+            </dl>
+    </div>
+</div>
+
+<hr />
+
+<h3>Productos Incluidos</h3>
+@if (Model.Detalle != null && Model.Detalle.Count > 0)
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Producto</th>
+                <th>Descripción</th>
+                <th>Cantidad</th>
+                <th>Precio Unitario</th>
+                <th>Subtotal</th>
+            </tr>
+        </thead>
+     <tbody>
+            @foreach (var detalle in Model.Detalle!) 
+            {
+                
+                var producto = detalle.Producto!; 
+                
+                <tr>
+                    <td>@Html.DisplayFor(item => producto.Descripcion)</td> // Acceso seguro
+                    <td>@Html.DisplayFor(item => detalle.Cantidad)</td>
+                    <td>@String.Format("{0:C}", producto.Precio)</td>
+                    <td>@String.Format("{0:C}", producto.Precio * detalle.Cantidad)</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <div class="alert alert-warning">
+        Este presupuesto no tiene productos cargados.
+    </div>
+}
+
+<div>
+    <a asp-action="Index" class="btn btn-secondary">Volver a la Lista</a>
+    <a asp-action="Edit" asp-route-id="@Model.IdPresupuesto" class="btn btn-primary">Editar Presupuesto</a>
+</div>

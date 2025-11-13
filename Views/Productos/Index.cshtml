@@ -1,0 +1,43 @@
+@model List<tl2_tp8_2025_ElAguhs.Models.Producto> 
+// Le decimos a la vista que recibirá una Lista de objetos 'Producto'
+
+@{
+    ViewData["Title"] = "Lista de Productos";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-success">Crear Nuevo Producto</a> 
+</p>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Descripción</th>
+            <th>Precio</th>
+            <th>Acciones</th> 
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model) 
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.IdProducto)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Descripcion)
+                </td>
+                <td>
+                    @String.Format("{0:C}", item.Precio)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.IdProducto" class="btn btn-sm btn-primary">Editar</a> |
+                    <a asp-action="Delete" asp-route-id="@item.IdProducto" class="btn btn-sm btn-danger">Eliminar</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
