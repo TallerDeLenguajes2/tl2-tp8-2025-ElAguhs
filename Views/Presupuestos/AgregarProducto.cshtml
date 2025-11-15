@@ -1,0 +1,49 @@
+@model tl2_tp8_2025_ElAguhs.ViewModels.AgregarProductoViewModel
+
+@{
+    ViewData["Title"] = "Agregar Producto al Presupuesto Nro " + Model.IdPresupuesto;
+}
+
+<h1>@ViewData["Title"]</h1>
+<h4>Detalle</h4>
+<hr />
+
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="AgregarProducto" method="post"> 
+            
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            
+            <input type="hidden" asp-for="IdPresupuesto" /> 
+
+            <div class="form-group">
+                <label asp-for="IdProducto" class="control-label"></label>
+                <select asp-for="IdProducto" asp-items="Model.ListaProductos" class="form-control">
+                    <option value="">-- Seleccione un Producto --</option>
+                </select>
+                <span asp-validation-for="IdProducto" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mt-3">
+                <label asp-for="Cantidad" class="control-label"></label>
+                <input asp-for="Cantidad" class="form-control" type="number" min="1" />
+                <span asp-validation-for="Cantidad" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mt-3">
+                <input type="submit" value="Agregar al Presupuesto" class="btn btn-success" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="mt-3">
+    <a asp-action="Details" asp-route-id="@Model.IdPresupuesto">Cancelar y Volver al Detalle</a>
+</div>
+
+@section Scripts {
+    @* CRÍTICO para que funcionen las validaciones Data Annotations *@
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

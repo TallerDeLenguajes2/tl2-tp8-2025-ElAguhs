@@ -1,94 +1,96 @@
 using Microsoft.AspNetCore.Mvc;
 using tl2_tp8_2025_ElAguhs.Models;
 using tl2_tp8_2025_ElAguhs.Repositorios;
+using tl2_tp8_2025_ElAguhs.ViewModels; // Nuevo
+using System.Collections.Generic;
+using System;
 
 namespace tl2_tp8_2025_ElAguhs.Controllers
 {
     public class ProductosController : Controller
     {
-        // Instancia del repositorio de Productos
-        private readonly ProductoRepository _productoRepository;
+        private readonly ProductoRepository _productoRepository = new ProductoRepository();
 
-        public ProductosController()
-        {
-            // Inicialización del repositorio
-            _productoRepository = new ProductoRepository();
-        }
+        // [ Index y Delete se mantienen usando la entidad Producto ]
 
-        // --- ETAPA I: LECTURA ---
-        // GET: /Productos
         [HttpGet]
         public IActionResult Index()
         {
-            // Nota: Asume que el método en tu ProductoRepository es GetAll()
             List<Producto> productos = _productoRepository.Listar();
             return View(productos);
         }
 
-        // --- ETAPA II: ESCRITURA (CREATE) ---
+        // --- CREATE ---
 
-        // GET: /Productos/Create (Muestra el formulario)
         [HttpGet]
         public IActionResult Create()
         {
-            return View();
+            return View(new ProductoViewModel()); // Devuelve ViewModel
         }
 
-        // POST: /Productos/Create (Recibe y guarda el formulario)
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(Producto producto)
+        public IActionResult Create(ProductoViewModel productoVM) // Recibe ViewModel
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                // Nota: Asume que el método en tu ProductoRepository es Crear()
-                _productoRepository.Crear(producto);
-                return RedirectToAction(nameof(Index));
+                return View(productoVM);
             }
-            return View(producto);
+
+            // Mapeo y FIX: Usamos ?? para asegurar que la Descripción nunca sea NULL.
+            var nuevoProducto = new Producto
+            {
+                Descripcion = productoVM.Descripcion ?? string.Empty, // FIX
+                Precio = (int)productoVM.Precio
+            };
+
+            _productoRepository.Crear(nuevoProducto);
+            return RedirectToAction(nameof(Index));
         }
-        // GET: /Productos/Edit/5
+
+        // --- EDIT ---
+
         [HttpGet]
         public IActionResult Edit(int id)
         {
-            // Corregido: Usamos ObtenerPorId
             Producto? producto = _productoRepository.ObtenerPorId(id);
+            if (producto == null) return NotFound();
 
-            if (producto == null)
+            // Mapeo Inverso de Modelo a ViewModel
+            var productoVM = new ProductoViewModel
             {
-                return NotFound();
-            }
+                IdProducto = producto.IdProducto,
+                Descripcion = producto.Descripcion,
+                Precio = producto.Precio
+            };
 
-            return View(producto);
+            return View(productoVM);
         }
 
-        // POST: /Productos/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(int id, Producto producto)
+        public IActionResult Edit(int id, ProductoViewModel productoVM) // Recibe ViewModel
         {
-            // ... (código de verificación y validación) ...
-
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                try
-                {
-                    // Verificado: El método se llama Modificar y recibe (id, producto)
-                    _productoRepository.Modificar(id, producto);
-                }
-                catch (Exception)
-                {
-                    // Verificación de existencia del producto
-                    if (_productoRepository.ObtenerPorId(id) == null)
-                    {
-                        return NotFound();
-                    }
-                    throw;
-                }
-                return RedirectToAction(nameof(Index));
+                return View(productoVM);
             }
-            return View(producto);
+
+            // Mapeo y FIX: Mapeamos de VM a Modelo
+            var productoAEditar = new Producto
+            {
+                IdProducto = productoVM.IdProducto,
+                Descripcion = productoVM.Descripcion ?? string.Empty, // FIX
+                Precio = (int)productoVM.Precio
+            };
+
+            _productoRepository.Modificar(id, productoAEditar);
+            return RedirectToAction(nameof(Index));
         }
+
+        // ... (Acciones Delete se mantienen igual) ...
+
+
         // GET: /Productos/Delete/5
         [HttpGet]
         public IActionResult Delete(int id)

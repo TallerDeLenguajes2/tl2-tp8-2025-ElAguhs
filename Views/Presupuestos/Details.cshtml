@@ -1,5 +1,4 @@
 @model tl2_tp8_2025_ElAguhs.Models.Presupuesto
-// El modelo es UN Presupuesto, que contiene una lista de Detalle.
 
 @{
     ViewData["Title"] = "Detalle del Presupuesto";
@@ -21,39 +20,59 @@
             <dt class="col-sm-4">Fecha de Creación:</dt>
             <dd class="col-sm-8">@Html.DisplayFor(model => model.FechaCreacion)</dd>
             
-            </dl>
+        </dl>
     </div>
 </div>
 
 <hr />
 
 <h3>Productos Incluidos</h3>
+<p>
+    <a asp-action="AgregarProducto" asp-route-idPresupuesto="@Model.IdPresupuesto" class="btn btn-sm btn-success">
+        <i class="bi bi-plus-circle"></i> Agregar Producto
+    </a>
+</p>
+
 @if (Model.Detalle != null && Model.Detalle.Count > 0)
 {
     <table class="table table-striped">
         <thead>
             <tr>
                 <th>Producto</th>
-                <th>Descripción</th>
                 <th>Cantidad</th>
                 <th>Precio Unitario</th>
                 <th>Subtotal</th>
+                <th>Acciones</th>
             </tr>
         </thead>
      <tbody>
             @foreach (var detalle in Model.Detalle!) 
             {
-                
                 var producto = detalle.Producto!; 
                 
                 <tr>
-                    <td>@Html.DisplayFor(item => producto.Descripcion)</td> // Acceso seguro
+                    <td>@Html.DisplayFor(item => producto.Descripcion)</td> 
                     <td>@Html.DisplayFor(item => detalle.Cantidad)</td>
                     <td>@String.Format("{0:C}", producto.Precio)</td>
                     <td>@String.Format("{0:C}", producto.Precio * detalle.Cantidad)</td>
+                    <td>
+                        <a asp-action="QuitarProducto" asp-route-idPresupuesto="@Model.IdPresupuesto" asp-route-idProducto="@producto.IdProducto" class="btn btn-danger btn-sm" onclick="return confirm('¿Está seguro de quitar este producto?');">
+                            Quitar
+                        </a>
+                    </td>
                 </tr>
             }
         </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="3" class="text-end"><strong>Monto Total (sin IVA):</strong></td>
+                <td colspan="2"><strong>@String.Format("{0:C}", Model.MontoPresupuesto())</strong></td>
+            </tr>
+            <tr>
+                <td colspan="3" class="text-end"><strong>Monto Total (con IVA 21%):</strong></td>
+                <td colspan="2"><strong>@String.Format("{0:C}", Model.MontoPresupuestoConIva())</strong></td>
+            </tr>
+        </tfoot>
     </table>
 }
 else
@@ -64,6 +83,7 @@ else
 }
 
 <div>
-    <a asp-action="Index" class="btn btn-secondary">Volver a la Lista</a>
-    <a asp-action="Edit" asp-route-id="@Model.IdPresupuesto" class="btn btn-primary">Editar Presupuesto</a>
+    <a asp-action="Index" class="btn btn-secondary">Volver a la Lista</a> |
+    <a asp-action="Edit" asp-route-id="@Model.IdPresupuesto" class="btn btn-primary">Editar Encabezado</a> |
+    <a asp-action="Delete" asp-route-id="@Model.IdPresupuesto" class="btn btn-danger">Eliminar Presupuesto</a>
 </div>

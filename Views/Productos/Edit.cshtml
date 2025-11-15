@@ -1,20 +1,22 @@
-@model tl2_tp8_2025_ElAguhs.ViewModels.ProductoViewModel
-// Asegúrate de que este namespace coincida con la ubicación de tu modelo Producto.
+@model tl2_tp8_2025_ElAguhs.ViewModels.ProductoViewModel 
+// CRÍTICO: Usa el ViewModel para la edición
 
 @{
-    ViewData["Title"] = "Crear Nuevo Producto";
+    ViewData["Title"] = "Editar Producto";
 }
 
-<h1>@ViewData["Title"]</h1>
-<h4>Producto</h4>
+<h1>Editar Producto</h1>
+<h4>@Model.Descripcion</h4>
 <hr />
 
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Create" method="post"> 
+        <form asp-action="Edit" method="post"> 
             
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             
+            <input type="hidden" asp-for="IdProducto" /> 
+
             <div class="form-group">
                 <label asp-for="Descripcion" class="control-label"></label>
                 <input asp-for="Descripcion" class="form-control" />
@@ -28,7 +30,7 @@
             </div>
 
             <div class="form-group mt-3">
-                <input type="submit" value="Crear" class="btn btn-primary" />
+                <input type="submit" value="Guardar Cambios" class="btn btn-primary" />
             </div>
         </form>
     </div>
@@ -40,7 +42,7 @@
 
 @section Scripts {
     @{
-        // Esto es necesario para que las validaciones del lado del cliente funcionen
+        // Habilita la validación del lado del cliente
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
 }
