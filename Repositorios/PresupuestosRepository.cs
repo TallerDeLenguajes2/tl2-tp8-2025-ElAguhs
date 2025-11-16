@@ -2,12 +2,12 @@ using Microsoft.Data.Sqlite;
 using System;
 using System.Collections.Generic;
 using tl2_tp8_2025_ElAguhs.Models;
-
+using tl2_tp8_2025_ElAguhs.Interfaces;
 namespace tl2_tp8_2025_ElAguhs.Repositorios
 {
-    public class PresupuestosRepository
+    public class PresupuestosRepository : IPresupuestoRepository
     {
-       private readonly string _connectionString = @"Data Source=C:\Users\rodri\OneDrive\Escritorio\tps-taller de lenguajes 2\tp8\tl2-tp8-2025-ElAguhs\tienda.db";
+        private readonly string _connectionString = "Data Source=tienda.db";
 
         private SqliteConnection GetConnection()
         {
@@ -36,23 +36,54 @@ namespace tl2_tp8_2025_ElAguhs.Repositorios
         }
 
 
-        public void AgregarProductoDetalle(int idPresupuesto, int idProducto, int cantidad)
+        public void QuitarProductoDetalle(int idPresupuesto, int idProducto)
         {
             using (var connection = GetConnection())
             {
                 connection.Open();
                 var command = connection.CreateCommand();
 
-
-                command.CommandText = "INSERT INTO PresupuestosDetalle (idPresupuesto, idProducto, Cantidad) VALUES (@idPres, @idProd, @cant)";
+                command.CommandText = "DELETE FROM PresupuestosDetalle WHERE idPresupuesto = @idPres AND idProducto = @idProd";
                 command.Parameters.AddWithValue("@idPres", idPresupuesto);
                 command.Parameters.AddWithValue("@idProd", idProducto);
-                command.Parameters.AddWithValue("@cant", cantidad);
 
                 command.ExecuteNonQuery();
             }
         }
 
+        // Dentro de Repositorios/PresupuestosRepository.cs
+
+        public void AgregarProductoDetalle(int idPresupuesto, int idProducto, int cantidad)
+        {
+            
+            using (var connection = GetConnection())
+            {
+                connection.Open();
+                var command = connection.CreateCommand();
+
+               
+                command.CommandText = @"
+            UPDATE PresupuestosDetalle SET Cantidad = Cantidad + @cant
+            WHERE idPresupuesto = @idPres AND idProducto = @idProd";
+
+                command.Parameters.AddWithValue("@idPres", idPresupuesto);
+                command.Parameters.AddWithValue("@idProd", idProducto);
+                command.Parameters.AddWithValue("@cant", cantidad);
+
+                int rowsAffected = command.ExecuteNonQuery();
+
+                
+                if (rowsAffected == 0)
+                {
+                    command.CommandText = @"
+                INSERT INTO PresupuestosDetalle (idPresupuesto, idProducto, Cantidad) 
+                VALUES (@idPres, @idProd, @cant)";
+
+                    
+                    command.ExecuteNonQuery();
+                }
+            }
+        }
 
         public List<Presupuesto> Listar()
         {
@@ -175,7 +206,7 @@ namespace tl2_tp8_2025_ElAguhs.Repositorios
                 }
             }
         }
-        // Método Modificar a añadir en Repositorios/PresupuestosRepository.cs
+
 
         public void Modificar(int id, Presupuesto presupuesto)
         {

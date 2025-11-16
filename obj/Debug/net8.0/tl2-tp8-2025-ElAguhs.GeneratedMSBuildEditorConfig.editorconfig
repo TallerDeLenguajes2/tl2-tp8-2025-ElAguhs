@@ -26,12 +26,24 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxQcml2YWN5LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/rodri/OneDrive/Escritorio/tps-taller de lenguajes 2/tp8/tl2-tp8-2025-ElAguhs/Views/Login/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTG9naW5cSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/rodri/OneDrive/Escritorio/tps-taller de lenguajes 2/tp8/tl2-tp8-2025-ElAguhs/Views/Presupuestos/AccesoDenegado.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUHJlc3VwdWVzdG9zXEFjY2Vzb0RlbmVnYWRvLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/rodri/OneDrive/Escritorio/tps-taller de lenguajes 2/tp8/tl2-tp8-2025-ElAguhs/Views/Presupuestos/AgregarProducto.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUHJlc3VwdWVzdG9zXEFncmVnYXJQcm9kdWN0by5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/rodri/OneDrive/Escritorio/tps-taller de lenguajes 2/tp8/tl2-tp8-2025-ElAguhs/Views/Presupuestos/Create.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUHJlc3VwdWVzdG9zXENyZWF0ZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/rodri/OneDrive/Escritorio/tps-taller de lenguajes 2/tp8/tl2-tp8-2025-ElAguhs/Views/Presupuestos/Delete.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUHJlc3VwdWVzdG9zXERlbGV0ZS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/rodri/OneDrive/Escritorio/tps-taller de lenguajes 2/tp8/tl2-tp8-2025-ElAguhs/Views/Presupuestos/Details.cshtml]
@@ -44,6 +56,10 @@ build_metadata.AdditionalFiles.CssScope =
 
 [C:/Users/rodri/OneDrive/Escritorio/tps-taller de lenguajes 2/tp8/tl2-tp8-2025-ElAguhs/Views/Presupuestos/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUHJlc3VwdWVzdG9zXEluZGV4LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/rodri/OneDrive/Escritorio/tps-taller de lenguajes 2/tp8/tl2-tp8-2025-ElAguhs/Views/Productos/AccesoDenegado.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUHJvZHVjdG9zXEFjY2Vzb0RlbmVnYWRvLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/rodri/OneDrive/Escritorio/tps-taller de lenguajes 2/tp8/tl2-tp8-2025-ElAguhs/Views/Productos/Create.cshtml]

@@ -1,27 +1,33 @@
 using Microsoft.Data.Sqlite;
 using System.Collections.Generic;
-using tl2_tp8_2025_ElAguhs.Models; 
-
+using tl2_tp8_2025_ElAguhs.Models;
+using tl2_tp8_2025_ElAguhs.Interfaces;
 namespace tl2_tp8_2025_ElAguhs.Repositorios
 {
-    public class ProductoRepository
+    public class ProductoRepository : IProductoRepository
     {
-        private readonly string _connectionString = @"Data Source=C:\Users\rodri\OneDrive\Escritorio\tps-taller de lenguajes 2\tp8\tl2-tp8-2025-ElAguhs\tienda.db";
+        private readonly string _connectionString = "Data Source=tienda.db";
+
+        public List<Producto> GetAll()
+        {
+            
+            return Listar();
+        }
 
         private SqliteConnection GetConnection()
         {
             return new SqliteConnection(_connectionString);
         }
 
-        
+
         public void Crear(Producto producto)
         {
             using (var connection = GetConnection())
             {
                 connection.Open();
                 var command = connection.CreateCommand();
-                
-                
+
+
                 command.CommandText = "INSERT INTO Productos (Descripcion, Precio) VALUES (@desc, @precio)";
                 command.Parameters.AddWithValue("@desc", producto.Descripcion);
                 command.Parameters.AddWithValue("@precio", producto.Precio);
@@ -30,15 +36,15 @@ namespace tl2_tp8_2025_ElAguhs.Repositorios
             }
         }
 
-       
+
         public void Modificar(int id, Producto producto)
         {
             using (var connection = GetConnection())
             {
                 connection.Open();
                 var command = connection.CreateCommand();
-                
-                
+
+
                 command.CommandText = "UPDATE Productos SET Descripcion = @desc, Precio = @precio WHERE idProducto = @id";
                 command.Parameters.AddWithValue("@desc", producto.Descripcion);
                 command.Parameters.AddWithValue("@precio", producto.Precio);
@@ -48,7 +54,7 @@ namespace tl2_tp8_2025_ElAguhs.Repositorios
             }
         }
 
-        
+
         public List<Producto> Listar()
         {
             var listaProductos = new List<Producto>();
@@ -56,8 +62,8 @@ namespace tl2_tp8_2025_ElAguhs.Repositorios
             {
                 connection.Open();
                 var command = connection.CreateCommand();
-                
-                
+
+
                 command.CommandText = "SELECT idProducto, Descripcion, Precio FROM [Productos]";
 
                 using (var reader = command.ExecuteReader())
@@ -68,8 +74,8 @@ namespace tl2_tp8_2025_ElAguhs.Repositorios
                         {
                             IdProducto = reader.GetInt32(0),
                             Descripcion = reader.GetString(1),
-                            
-                            Precio = (int)reader.GetDouble(2) 
+
+                            Precio = (int)reader.GetDouble(2)
                         };
                         listaProductos.Add(producto);
                     }
@@ -78,7 +84,7 @@ namespace tl2_tp8_2025_ElAguhs.Repositorios
             return listaProductos;
         }
 
-        
+
         public Producto? ObtenerPorId(int id)
         {
             Producto? producto = null;
@@ -87,7 +93,7 @@ namespace tl2_tp8_2025_ElAguhs.Repositorios
                 connection.Open();
                 var command = connection.CreateCommand();
 
-                
+
                 command.CommandText = "SELECT idProducto, Descripcion, Precio FROM Productos WHERE idProducto = @id";
                 command.Parameters.AddWithValue("@id", id);
 
@@ -107,7 +113,7 @@ namespace tl2_tp8_2025_ElAguhs.Repositorios
             return producto;
         }
 
-        
+
         public void Eliminar(int id)
         {
             using (var connection = GetConnection())
@@ -115,7 +121,7 @@ namespace tl2_tp8_2025_ElAguhs.Repositorios
                 connection.Open();
                 var command = connection.CreateCommand();
 
-                
+
                 command.CommandText = "DELETE FROM Productos WHERE idProducto = @id";
                 command.Parameters.AddWithValue("@id", id);
                 command.ExecuteNonQuery();

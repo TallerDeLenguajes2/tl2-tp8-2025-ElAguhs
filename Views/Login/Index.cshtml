@@ -1,0 +1,44 @@
+@model tl2_tp8_2025_ElAguhs.ViewModels.LoginViewModel
+
+@{
+    ViewData["Title"] = "Iniciar Sesión";
+}
+
+<div class="row">
+    <div class="col-md-4 mx-auto">
+        <h2 class="text-center">Iniciar Sesión</h2>
+        <hr />
+        
+        @* Usa la acción Login que recibe el modelo *@
+        <form asp-controller="Login" asp-action="Login" method="post">
+            
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            
+            @* Muestra el error general del servidor (credenciales inválidas) *@
+            @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+            {
+                <div class="alert alert-danger">@Model.ErrorMessage</div>
+            }
+
+            <div class="form-group">
+                <label asp-for="Username" class="control-label"></label>
+                <input asp-for="Username" class="form-control" />
+                <span asp-validation-for="Username" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mt-3">
+                <label asp-for="Password" class="control-label"></label>
+                <input asp-for="Password" class="form-control" />
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mt-4">
+                <input type="submit" value="Acceder" class="btn btn-primary w-100" />
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -8,7 +8,7 @@ namespace tl2_tp8_2025_ElAguhs.ViewModels
 
         [Display(Name = "Descripción del Producto")]
         [StringLength(250, ErrorMessage = "La descripción no puede superar los 250 caracteres.")]
-        public string? Descripcion { get; set; } // Opcional
+        public string? Descripcion { get; set; } 
 
         [Display(Name = "Precio Unitario")]
         [Required(ErrorMessage = "El precio es obligatorio.")]

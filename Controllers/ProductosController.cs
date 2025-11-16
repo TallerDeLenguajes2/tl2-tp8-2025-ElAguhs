@@ -1,22 +1,56 @@
 using Microsoft.AspNetCore.Mvc;
 using tl2_tp8_2025_ElAguhs.Models;
-using tl2_tp8_2025_ElAguhs.Repositorios;
-using tl2_tp8_2025_ElAguhs.ViewModels; // Nuevo
+using tl2_tp8_2025_ElAguhs.ViewModels;
+using tl2_tp8_2025_ElAguhs.Interfaces; // Inyección de Dependencias
 using System.Collections.Generic;
 using System;
+using System.Linq;
 
 namespace tl2_tp8_2025_ElAguhs.Controllers
 {
     public class ProductosController : Controller
     {
-        private readonly ProductoRepository _productoRepository = new ProductoRepository();
+        // Dependencias inyectadas por el constructor (TP10 - Fase 1)
+        private readonly IProductoRepository _productoRepository;
+        private readonly IAuthenticationService _authService;
 
-        // [ Index y Delete se mantienen usando la entidad Producto ]
+        public ProductosController(IProductoRepository productoRepo, IAuthenticationService authService)
+        {
+            _productoRepository = productoRepo;
+            _authService = authService;
+        }
+
+        // --- LÓGICA DE SEGURIDAD (FASE 3) ---
+
+        private IActionResult CheckAdminPermissions()
+        {
+            // 1. No logueado? -> redirige al login
+            if (!_authService.IsAuthenticated())
+                return RedirectToAction("Index", "Login");
+
+            // 2. No es Administrador? -> Acceso Denegado
+            if (!_authService.HasAccessLevel("Administrador"))
+                return RedirectToAction(nameof(AccesoDenegado)); 
+
+            return null!; // Permiso concedido
+        }
+
+        [HttpGet]
+        public IActionResult AccesoDenegado()
+        {
+            // Vista de error de acceso denegado (Punto 8)
+            return View(); 
+        }
+
+        // --- CRUD PROTEGIDO (Acceso solo para Administrador) ---
 
         [HttpGet]
         public IActionResult Index()
         {
-            List<Producto> productos = _productoRepository.Listar();
+            var securityCheck = CheckAdminPermissions();
+            if (securityCheck != null) return securityCheck; // Aplica la seguridad
+            
+            List<Producto> productos = _productoRepository.Listar(); // Uso de la interfaz DI
             return View(productos);
         }
 
@@ -25,6 +59,9 @@ namespace tl2_tp8_2025_ElAguhs.Controllers
         [HttpGet]
         public IActionResult Create()
         {
+            var securityCheck = CheckAdminPermissions();
+            if (securityCheck != null) return securityCheck;
+            
             return View(new ProductoViewModel()); // Devuelve ViewModel
         }
 
@@ -32,6 +69,9 @@ namespace tl2_tp8_2025_ElAguhs.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Create(ProductoViewModel productoVM) // Recibe ViewModel
         {
+            var securityCheck = CheckAdminPermissions();
+            if (securityCheck != null) return securityCheck;
+
             if (!ModelState.IsValid)
             {
                 return View(productoVM);
@@ -40,8 +80,9 @@ namespace tl2_tp8_2025_ElAguhs.Controllers
             // Mapeo y FIX: Usamos ?? para asegurar que la Descripción nunca sea NULL.
             var nuevoProducto = new Producto
             {
-                Descripcion = productoVM.Descripcion ?? string.Empty, // FIX
-                Precio = (int)productoVM.Precio
+                // FIX: Convierte null a string.Empty para evitar el error de base de datos
+                Descripcion = productoVM.Descripcion ?? string.Empty, 
+                Precio = (int)productoVM.Precio // Asume casteo a INT
             };
 
             _productoRepository.Crear(nuevoProducto);
@@ -53,6 +94,9 @@ namespace tl2_tp8_2025_ElAguhs.Controllers
         [HttpGet]
         public IActionResult Edit(int id)
         {
+            var securityCheck = CheckAdminPermissions();
+            if (securityCheck != null) return securityCheck;
+
             Producto? producto = _productoRepository.ObtenerPorId(id);
             if (producto == null) return NotFound();
 
@@ -71,16 +115,16 @@ namespace tl2_tp8_2025_ElAguhs.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Edit(int id, ProductoViewModel productoVM) // Recibe ViewModel
         {
-            if (!ModelState.IsValid)
-            {
-                return View(productoVM);
-            }
+            var securityCheck = CheckAdminPermissions();
+            if (securityCheck != null) return securityCheck;
 
-            // Mapeo y FIX: Mapeamos de VM a Modelo
+            if (!ModelState.IsValid) return View(productoVM);
+
+            // Mapeo de VM a Modelo
             var productoAEditar = new Producto
             {
                 IdProducto = productoVM.IdProducto,
-                Descripcion = productoVM.Descripcion ?? string.Empty, // FIX
+                Descripcion = productoVM.Descripcion ?? string.Empty,
                 Precio = (int)productoVM.Precio
             };
 
@@ -88,30 +132,29 @@ namespace tl2_tp8_2025_ElAguhs.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // ... (Acciones Delete se mantienen igual) ...
+        // --- DELETE ---
 
-
-        // GET: /Productos/Delete/5
         [HttpGet]
         public IActionResult Delete(int id)
         {
+            var securityCheck = CheckAdminPermissions();
+            if (securityCheck != null) return securityCheck;
+
             Producto? producto = _productoRepository.ObtenerPorId(id);
 
-            if (producto == null)
-            {
-                return NotFound();
-            }
+            if (producto == null) return NotFound();
 
-            return View(producto);
+            return View(producto); // Retorna la vista de confirmación
         }
-        // POST: /Productos/Delete/5
+
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public IActionResult DeleteConfirmed(int id)
         {
-            // Llamamos al método correcto del repositorio
-            _productoRepository.Eliminar(id);
+            var securityCheck = CheckAdminPermissions();
+            if (securityCheck != null) return securityCheck;
 
+            _productoRepository.Eliminar(id);
             return RedirectToAction(nameof(Index));
         }
     }

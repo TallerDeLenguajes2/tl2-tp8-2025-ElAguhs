@@ -1,90 +1,135 @@
 using Microsoft.AspNetCore.Mvc;
 using tl2_tp8_2025_ElAguhs.Models;
-using tl2_tp8_2025_ElAguhs.Repositorios;
-using tl2_tp8_2025_ElAguhs.ViewModels; 
-using System.Collections.Generic;
-using Microsoft.AspNetCore.Mvc.Rendering; 
+using tl2_tp8_2025_ElAguhs.ViewModels;
+using tl2_tp8_2025_ElAguhs.Interfaces; // Inyección de Dependencias
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace tl2_tp8_2025_ElAguhs.Controllers
 {
     public class PresupuestosController : Controller
     {
-        private readonly PresupuestosRepository? _presupuestosRepository;
-        // Repositorio de Productos para cargar el Dropdown de AgregarProducto
-        private readonly ProductoRepository _productoRepo = new ProductoRepository(); 
+        // Dependencias inyectadas por el constructor
+        private readonly IPresupuestoRepository _presupuestosRepository;
+        private readonly IProductoRepository _productoRepo;
+        private readonly IAuthenticationService _authService;
 
-        public PresupuestosController()
+        public PresupuestosController(IPresupuestoRepository presupuestoRepo,
+                                     IProductoRepository productoRepo,
+                                     IAuthenticationService authService)
         {
-            _presupuestosRepository = new PresupuestosRepository();
+            _presupuestosRepository = presupuestoRepo;
+            _productoRepo = productoRepo;
+            _authService = authService;
         }
 
-        // --- LECTURA ---
+        // --- LÓGICA DE SEGURIDAD (HELPERS) ---
+
+        [HttpGet]
+        public IActionResult AccesoDenegado()
+        {
+            return View();
+        }
+
+        private IActionResult CheckReadPermissions()
+        {
+            // Chequeo de que el usuario esté logueado
+            if (!_authService.IsAuthenticated())
+                return RedirectToAction("Index", "Login");
+
+            // Permite acceso si es Administrador O Cliente
+            if (!_authService.HasAccessLevel("Administrador") && !_authService.HasAccessLevel("Cliente"))
+                return RedirectToAction(nameof(AccesoDenegado));
+
+            return null!;
+        }
+
+        private IActionResult CheckWritePermissions()
+        {
+            // Chequeo de que el usuario esté logueado
+            if (!_authService.IsAuthenticated())
+                return RedirectToAction("Index", "Login");
+
+            // Permite acceso SOLO si es Administrador
+            if (!_authService.HasAccessLevel("Administrador"))
+                return RedirectToAction(nameof(AccesoDenegado));
+
+            return null!;
+        }
+
+        // --- LECTURA PROTEGIDA (Index / Details) ---
 
         [HttpGet]
         public IActionResult Index()
         {
-            List<Presupuesto> presupuestos = _presupuestosRepository!.Listar(); 
+            var securityCheck = CheckReadPermissions();
+            if (securityCheck != null) return securityCheck;
+            
+            List<Presupuesto> presupuestos = _presupuestosRepository!.Listar();
             return View(presupuestos);
         }
 
         [HttpGet]
-        public IActionResult Details(int id)
+        public IActionResult Details(int id) 
         {
-            // MÉTODO CRÍTICO QUE SOLUCIONA EL ERROR CS0103
+            var securityCheck = CheckReadPermissions();
+            if (securityCheck != null) return securityCheck;
+
             Presupuesto? presupuesto = _presupuestosRepository!.ObtenerPorId(id);
 
             if (presupuesto == null) return NotFound();
-            
+
             return View(presupuesto);
         }
 
-        // --- ESCRITURA (CREATE) con ViewModel ---
+        // --- ESCRITURA PROTEGIDA (Create / Edit / Delete) ---
 
         [HttpGet]
         public IActionResult Create()
         {
+            var securityCheck = CheckWritePermissions(); // SOLO ADMIN
+            if (securityCheck != null) return securityCheck;
+
             return View(new PresupuestoViewModel());
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(PresupuestoViewModel viewModel)
+        public IActionResult Create(PresupuestoViewModel presupuestoVM)
         {
-            // Validación de Regla de Negocio: La fecha de creación no puede ser futura.
-            if (viewModel.FechaCreacion.Date > DateTime.Now.Date)
+            var securityCheck = CheckWritePermissions();
+            if (securityCheck != null) return securityCheck;
+
+            // Validación de Regla de Negocio: La fecha no puede ser futura
+            if (presupuestoVM.FechaCreacion.Date > DateTime.Now.Date)
             {
                 ModelState.AddModelError("FechaCreacion", "La fecha de creación no puede ser futura.");
             }
 
-            if (ModelState.IsValid)
-            {
-                // Mapeo de ViewModel a Entidad (Model)
-                Presupuesto nuevoPresupuesto = new Presupuesto
-                {
-                    NombreDestinatario = viewModel.NombreDestinatario!,
-                    FechaCreacion = viewModel.FechaCreacion
-                };
+            if (!ModelState.IsValid) return View(presupuestoVM);
 
-                int newId = _presupuestosRepository!.Crear(nuevoPresupuesto);
-                
-                // Redirigir a Details para ver el presupuesto recién creado
-                return RedirectToAction(nameof(Details), new { id = newId });
-            }
-            
-            return View(viewModel);
+            Presupuesto nuevoPresupuesto = new Presupuesto
+            {
+                NombreDestinatario = presupuestoVM.NombreDestinatario!,
+                FechaCreacion = presupuestoVM.FechaCreacion
+            };
+
+            int newId = _presupuestosRepository!.Crear(nuevoPresupuesto);
+            return RedirectToAction(nameof(Details), new { id = newId });
         }
-        
-        // --- ESCRITURA (EDIT) con ViewModel ---
 
         [HttpGet]
         public IActionResult Edit(int id)
         {
+            var securityCheck = CheckWritePermissions();
+            if (securityCheck != null) return securityCheck;
+
             Presupuesto? presupuesto = _presupuestosRepository!.ObtenerPorId(id);
             if (presupuesto == null) return NotFound();
 
-            // Mapeo de Entidad a ViewModel para la vista
+            // Mapeo de Entidad a ViewModel
             PresupuestoViewModel viewModel = new PresupuestoViewModel
             {
                 IdPresupuesto = presupuesto.IdPresupuesto,
@@ -99,51 +144,71 @@ namespace tl2_tp8_2025_ElAguhs.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Edit(int id, PresupuestoViewModel viewModel)
         {
+            var securityCheck = CheckWritePermissions();
+            if (securityCheck != null) return securityCheck;
+
             if (id != viewModel.IdPresupuesto) return NotFound();
 
-            // Validación de Regla de Negocio: La fecha de creación no puede ser futura.
             if (viewModel.FechaCreacion.Date > DateTime.Now.Date)
             {
                 ModelState.AddModelError("FechaCreacion", "La fecha de creación no puede ser futura.");
             }
 
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid) return View(viewModel);
+
+            try
             {
-                try
+                Presupuesto presupuestoActualizado = new Presupuesto
                 {
-                    // Mapeo de ViewModel a Entidad (Model)
-                    Presupuesto presupuestoActualizado = new Presupuesto
-                    {
-                        IdPresupuesto = viewModel.IdPresupuesto,
-                        NombreDestinatario = viewModel.NombreDestinatario!,
-                        FechaCreacion = viewModel.FechaCreacion
-                    };
-                    
-                    _presupuestosRepository!.Modificar(id, presupuestoActualizado); 
-                }
-                catch (Exception)
-                {
-                    if (_presupuestosRepository!.ObtenerPorId(id) == null) return NotFound();
-                    throw; 
-                }
-                
-                // Redirigir a Details para ver los cambios
-                return RedirectToAction(nameof(Details), new { id = id });
+                    IdPresupuesto = viewModel.IdPresupuesto,
+                    NombreDestinatario = viewModel.NombreDestinatario!,
+                    FechaCreacion = viewModel.FechaCreacion
+                };
+
+                _presupuestosRepository!.Modificar(id, presupuestoActualizado);
             }
-            
-            return View(viewModel);
+            catch (Exception)
+            {
+                if (_presupuestosRepository!.ObtenerPorId(id) == null) return NotFound();
+                throw;
+            }
+
+            return RedirectToAction(nameof(Details), new { id = id });
         }
-        
-        // --- AGREGAR PRODUCTO (Many-to-Many) con ViewModel ---
+
+        [HttpGet]
+        public IActionResult Delete(int id)
+        {
+            var securityCheck = CheckWritePermissions();
+            if (securityCheck != null) return securityCheck;
+
+            Presupuesto? presupuesto = _presupuestosRepository!.ObtenerPorId(id);
+            if (presupuesto == null) return NotFound();
+            return View(presupuesto);
+        }
+
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public IActionResult DeleteConfirmed(int id)
+        {
+            var securityCheck = CheckWritePermissions();
+            if (securityCheck != null) return securityCheck;
+
+            _presupuestosRepository!.Eliminar(id);
+            return RedirectToAction(nameof(Index));
+        }
+
+        // --- LÓGICA RELACIONAL (Agregar/Quitar Producto) ---
 
         [HttpGet]
         public IActionResult AgregarProducto(int idPresupuesto)
         {
-            if (_presupuestosRepository!.ObtenerPorId(idPresupuesto) == null) return NotFound();
-            
-            var productos = _productoRepo.Listar(); 
+            var securityCheck = CheckWritePermissions();
+            if (securityCheck != null) return securityCheck;
 
-            var viewModel = new AgregarProductoViewModel
+            // FIX para CS0103: Inicializar el ViewModel dentro del método
+            var productos = _productoRepo.Listar();
+            var viewModel = new AgregarProductoViewModel 
             {
                 IdPresupuesto = idPresupuesto,
                 ListaProductos = new SelectList(productos, "IdProducto", "Descripcion")
@@ -156,49 +221,31 @@ namespace tl2_tp8_2025_ElAguhs.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult AgregarProducto(AgregarProductoViewModel model)
         {
-            // Si la validación (DataAnnotations) falla
+            var securityCheck = CheckWritePermissions();
+            if (securityCheck != null) return securityCheck;
+            
+            // Lógica Crítica de Recarga del SelectList
             if (!ModelState.IsValid)
             {
-                // Recargar el SelectList antes de volver a mostrar la vista
-                var productos = _productoRepo.Listar(); 
+                var productos = _productoRepo.Listar();
                 model.ListaProductos = new SelectList(productos, "IdProducto", "Descripcion");
                 return View(model); 
             }
 
-            // Si es VÁLIDO: Llamar al repositorio para guardar la relación
             _presupuestosRepository!.AgregarProductoDetalle(model.IdPresupuesto, model.IdProducto, model.Cantidad);
-
-            // Redirigir al detalle del presupuesto
             return RedirectToAction(nameof(Details), new { id = model.IdPresupuesto });
         }
-        
-        // --- ELIMINAR PRESUPUESTO COMPLETO ---
-
-        [HttpGet]
-        public IActionResult Delete(int id)
-        {
-            Presupuesto? presupuesto = _presupuestosRepository!.ObtenerPorId(id);
-            if (presupuesto == null) return NotFound();
-            return View(presupuesto);
-        }
-
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public IActionResult DeleteConfirmed(int id)
-        {
-            _presupuestosRepository!.Eliminar(id); 
-            
-            return RedirectToAction(nameof(Index));
-        }
-        
-        // --- ACCIÓN AUXILIAR PARA ELIMINAR UN DETALLE (Opcional) ---
 
         [HttpGet]
         public IActionResult QuitarProducto(int idPresupuesto, int idProducto)
         {
-            // Asumiendo que has implementado QuitarProductoDetalle en tu repositorio
-            // Si no lo tienes, puedes comentarlo o implementarlo.
-            // _presupuestosRepository!.QuitarProductoDetalle(idPresupuesto, idProducto);
+            // Requiere permisos de escritura porque modifica la base de datos
+            var securityCheck = CheckWritePermissions();
+            if (securityCheck != null) return securityCheck;
+
+            _presupuestosRepository!.QuitarProductoDetalle(idPresupuesto, idProducto);
+
+            // Redirige al detalle del presupuesto
             return RedirectToAction(nameof(Details), new { id = idPresupuesto });
         }
     }

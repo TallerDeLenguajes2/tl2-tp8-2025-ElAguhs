@@ -1,0 +1,21 @@
+@* Views/Presupuestos/AccesoDenegado.cshtml *@
+@{
+    ViewData["Title"] = "Acceso Denegado";
+}
+
+<div class="row">
+    <div class="col-md-8 mx-auto text-center">
+        <h1 class="text-danger"> Acceso Denegado (Error 403)</h1>
+        <hr />
+
+        <h2>Permiso Insuficiente</h2>
+        <p>
+            Lo sentimos. Su rol (**Cliente**) no tiene permisos para acceder a esta funcionalidad de **Modificación/Escritura**.
+            Esta sección está reservada para usuarios con el rol **Administrador**.
+        </p>
+        <div class="mt-4">
+            <a asp-action="Index" class="btn btn-primary">Volver a Listado de Presupuestos</a>
+            <a asp-action="Logout" asp-controller="Login" class="btn btn-secondary">Cerrar Sesión</a>
+        </div>
+    </div>
+</div>

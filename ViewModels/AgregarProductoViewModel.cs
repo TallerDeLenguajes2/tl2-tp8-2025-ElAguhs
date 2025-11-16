@@ -5,7 +5,7 @@ namespace tl2_tp8_2025_ElAguhs.ViewModels
 {
     public class AgregarProductoViewModel
     {
-        // ID del presupuesto al que se va a agregar (se envía desde la vista Details)
+        
         public int IdPresupuesto { get; set; } 
         
         [Display(Name = "Producto a agregar")]
@@ -17,7 +17,7 @@ namespace tl2_tp8_2025_ElAguhs.ViewModels
         [Range(1, int.MaxValue, ErrorMessage = "La cantidad debe ser mayor a cero.")]
         public int Cantidad { get; set; }
 
-        // Propiedad para que el Controlador cargue el dropdown de selección
+       
         public SelectList? ListaProductos { get; set; }
     }
 }

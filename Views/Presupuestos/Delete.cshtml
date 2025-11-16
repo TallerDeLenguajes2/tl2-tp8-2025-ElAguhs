@@ -1,0 +1,28 @@
+@model tl2_tp8_2025_ElAguhs.Models.Presupuesto
+
+@{
+    ViewData["Title"] = "Confirmar Eliminación";
+}
+
+<h1>Eliminar Presupuesto</h1>
+<h3>¿Estás seguro de que deseas eliminar este presupuesto?</h3>
+<hr />
+
+<div>
+    <h4>Presupuesto Nro @Model.IdPresupuesto</h4>
+    <dl class="row">
+        <dt class="col-sm-4">Destinatario:</dt>
+        <dd class="col-sm-8">@Html.DisplayFor(model => model.NombreDestinatario)</dd>
+
+        <dt class="col-sm-4">Fecha de Creación:</dt>
+        <dd class="col-sm-8">@Html.DisplayFor(model => model.FechaCreacion)</dd>
+    </dl>
+
+    @* Formulario para confirmar la eliminación (POST) *@
+    <form asp-action="Delete" asp-route-id="@Model.IdPresupuesto">
+        <input type="hidden" asp-for="IdPresupuesto" /> 
+        
+        <input type="submit" value="Confirmar Eliminación" class="btn btn-danger" /> |
+        <a asp-action="Index">Cancelar y Volver a la Lista</a>
+    </form>
+</div>

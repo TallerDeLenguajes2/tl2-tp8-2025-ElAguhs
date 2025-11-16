@@ -42,6 +42,7 @@ C:\Users\rodri\OneDrive\Escritorio\tps-taller de lenguajes 2\tp8\tl2-tp8-2025-El
 C:\Users\rodri\OneDrive\Escritorio\tps-taller de lenguajes 2\tp8\tl2-tp8-2025-ElAguhs\obj\Debug\net8.0\tl2-tp8-2025-ElAguhs.MvcApplicationPartsAssemblyInfo.cache
 C:\Users\rodri\OneDrive\Escritorio\tps-taller de lenguajes 2\tp8\tl2-tp8-2025-ElAguhs\obj\Debug\net8.0\tl2-tp8-2025-ElAguhs.RazorAssemblyInfo.cache
 C:\Users\rodri\OneDrive\Escritorio\tps-taller de lenguajes 2\tp8\tl2-tp8-2025-ElAguhs\obj\Debug\net8.0\tl2-tp8-2025-ElAguhs.RazorAssemblyInfo.cs
+C:\Users\rodri\OneDrive\Escritorio\tps-taller de lenguajes 2\tp8\tl2-tp8-2025-ElAguhs\obj\Debug\net8.0\tl2-tp8-2025-ElAguhs.sourcelink.json
 C:\Users\rodri\OneDrive\Escritorio\tps-taller de lenguajes 2\tp8\tl2-tp8-2025-ElAguhs\obj\Debug\net8.0\staticwebassets.build.json
 C:\Users\rodri\OneDrive\Escritorio\tps-taller de lenguajes 2\tp8\tl2-tp8-2025-ElAguhs\obj\Debug\net8.0\staticwebassets.development.json
 C:\Users\rodri\OneDrive\Escritorio\tps-taller de lenguajes 2\tp8\tl2-tp8-2025-ElAguhs\obj\Debug\net8.0\staticwebassets\msbuild.tl2-tp8-2025-ElAguhs.Microsoft.AspNetCore.StaticWebAssets.props
@@ -58,4 +59,3 @@ C:\Users\rodri\OneDrive\Escritorio\tps-taller de lenguajes 2\tp8\tl2-tp8-2025-El
 C:\Users\rodri\OneDrive\Escritorio\tps-taller de lenguajes 2\tp8\tl2-tp8-2025-ElAguhs\obj\Debug\net8.0\tl2-tp8-2025-ElAguhs.pdb
 C:\Users\rodri\OneDrive\Escritorio\tps-taller de lenguajes 2\tp8\tl2-tp8-2025-ElAguhs\obj\Debug\net8.0\tl2-tp8-2025-ElAguhs.genruntimeconfig.cache
 C:\Users\rodri\OneDrive\Escritorio\tps-taller de lenguajes 2\tp8\tl2-tp8-2025-ElAguhs\obj\Debug\net8.0\ref\tl2-tp8-2025-ElAguhs.dll
-C:\Users\rodri\OneDrive\Escritorio\tps-taller de lenguajes 2\tp8\tl2-tp8-2025-ElAguhs\obj\Debug\net8.0\tl2-tp8-2025-ElAguhs.sourcelink.json
